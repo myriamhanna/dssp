@@ -26,7 +26,7 @@ class Pdb:
             elif(line[0:10] == "SOURCE   2"):
                 dico['source'] = line
             elif(line[0:10] == "AUTHOR   "):
-                dico['author'] = lines
+                dico['author'] = line
 
 
     def get_info(self):
@@ -38,7 +38,7 @@ class Pdb:
                 prev_resname = line[17:20].strip()
             if line[22:26] != prev_nb:
                 mylist.append(prev_resname)
-                self.content[str(prev_nb.strip())] = mylist
+                self.content[(prev_nb.strip())] = mylist
                 prev_nb = line[22:26]
                 prev_resname = line[17:20]
                 mylist = []
@@ -48,30 +48,31 @@ class Pdb:
                 mylist.append(float(line[38:46]))
                 mylist.append(float(line[46:54]))
                     #print(line[30:38])
-                print(mylist)
+                #print(mylist)
             cpt += 1
 
     def find_Hbonds(self):
         q1 = 0.42
         q2 = 0.20
         f = 332
-        r_ON = math.sqrt((self.content["16"][9] - self.content["20"][1])**2 +
-                        (self.content["16"][10] - self.content["20"][2])**2 +
-                        (self.content["16"][11] - self.content["20"][3])**2)
-        r_CH = math.sqrt((self.content["16"][5] - self.content["20"][13])**2 +
-                        (self.content["16"][6] - self.content["20"][14])**2 +
-                        (self.content["16"][7] - self.content["20"][15])**2)
-        r_OH = math.sqrt((self.content["16"][9] - self.content["20"][13])**2 +
-                        (self.content["16"][10] - self.content["20"][14])**2 +
-                        (self.content["16"][11] - self.content["20"][15])**2)
-        r_CN = math.sqrt((self.content["16"][5] - self.content["20"][1])**2 +
-                        (self.content["16"][6] - self.content["20"][2])**2 +
-                        (self.content["16"][7] - self.content["20"][3])**2)
+        for key in self.content.items():
+            r_ON = math.sqrt((self.content[i][9] - self.content[i+1][1])**2 +
+                            (self.content[i][10] - self.content[i+1][2])**2 +
+                            (self.content[i][11] - self.content[i+1][3])**2)
+            r_CH = math.sqrt((self.content[i][5] - self.content[i+1][13])**2 +
+                            (self.content[i][6] - self.content[i+1][14])**2 +
+                            (self.content[i][7] - self.content[i+1][15])**2)
+            r_OH = math.sqrt((self.content[i][9] - self.content[i+1][13])**2 +
+                            (self.content[i][10] - self.content[i+1][14])**2 +
+                            (self.content[i][11] - self.content[i+1][15])**2)
+            r_CN = math.sqrt((self.content[i][5] - self.content[i+1][1])**2 +
+                            (self.content[i][6] - self.content[i+1][2])**2 +
+                            (self.content[i][7] - self.content[i+1][3])**2)
         E = q1*q2*(1/r_ON + 1/r_CH + 1/r_OH + 1/r_CN)*f
-        print(r_ON)
-        print(r_CH)
-        print(r_OH)
-        print(r_CN)
+        #print(r_ON)
+        #print(r_CH)
+        #print(r_OH)
+        #print(r_CN)
         return E
 
 
