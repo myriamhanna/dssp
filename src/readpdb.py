@@ -7,7 +7,7 @@ class Pdb:
         #self.filename = "../data/1est_H.pdb"
         self.filename = filename
         self.lines = self.read_pdb(filename)
-        self.dico = self.read_top()
+        #self.dico = self.read_top()
         self.content = {}
         #self.atom_names = [' N  ', ' C  ', ' H01', ' O  ']
         self.atom_names = ['N', 'C', 'H01', 'O']
@@ -16,59 +16,65 @@ class Pdb:
         with open(filename) as filin:
             return filin.readlines()
 
-    def read_top(self):
-        dico = {}
-        for line in self.lines:
-            if(line[0:10] == "HEADER    "):
-                dico['header'] = line
-            elif(line[0:10] == "COMPND   2"):
-                dico['compound'] = line
-            elif(line[0:10] == "SOURCE   2"):
-                dico['source'] = line
-            elif(line[0:10] == "AUTHOR   "):
-                dico['author'] = line
-
 
     def get_info(self):
         cpt = 0
         mylist = []
         for line in self.lines:
-            if cpt == 0:
-                prev_nb = line[22:26]
-                prev_resname = line[17:20].strip()
-            if line[22:26] != prev_nb:
-                mylist.append(prev_resname)
-                self.content[(prev_nb.strip())] = mylist
-                prev_nb = line[22:26]
-                prev_resname = line[17:20]
-                mylist = []
-            if line[12:16].strip() in self.atom_names:
-                mylist.append(line[12:16].strip())
-                mylist.append(float(line[30:38]))
-                mylist.append(float(line[38:46]))
-                mylist.append(float(line[46:54]))
+            if line[0:6].strip() == "ATOM":
+                if cpt == 0:
+                    prev_nb = line[22:26]
+                    prev_resname = line[17:20].strip()
+                if line[22:26] != prev_nb:
+                    mylist.append(prev_resname)
+                    self.content[(prev_nb.strip())] = mylist
+                    prev_nb = line[22:26]
+                    prev_resname = line[17:20]
+                    mylist = []
+                if line[12:16].strip() in self.atom_names:
+                    mylist.append(line[12:16].strip())
+                    mylist.append(float(line[30:38]))
+                    mylist.append(float(line[38:46]))
+                    mylist.append(float(line[46:54]))
                     #print(line[30:38])
-                #print(mylist)
-            cpt += 1
+                    #print(mylist)
+                cpt += 1
 
-    def find_Hbonds(self):
+    #def energy_Hbonds(self):
+    #    """ method that return the energy between atoms that form Hbonds"""
+    #    q1 = 0.42
+    #    q2 = 0.20
+    #    f = 332
+
+
+    def find_nturns(self):
         q1 = 0.42
         q2 = 0.20
         f = 332
-        for key in self.content.items():
-            r_ON = math.sqrt((self.content[i][9] - self.content[i+1][1])**2 +
-                            (self.content[i][10] - self.content[i+1][2])**2 +
-                            (self.content[i][11] - self.content[i+1][3])**2)
-            r_CH = math.sqrt((self.content[i][5] - self.content[i+1][13])**2 +
-                            (self.content[i][6] - self.content[i+1][14])**2 +
-                            (self.content[i][7] - self.content[i+1][15])**2)
-            r_OH = math.sqrt((self.content[i][9] - self.content[i+1][13])**2 +
-                            (self.content[i][10] - self.content[i+1][14])**2 +
-                            (self.content[i][11] - self.content[i+1][15])**2)
-            r_CN = math.sqrt((self.content[i][5] - self.content[i+1][1])**2 +
-                            (self.content[i][6] - self.content[i+1][2])**2 +
-                            (self.content[i][7] - self.content[i+1][3])**2)
-        E = q1*q2*(1/r_ON + 1/r_CH + 1/r_OH + 1/r_CN)*f
+
+        for i, j in enumerate(list(self.content.keys())):
+            #print(i, j)
+            #print(type(i))
+            #print(type(j))
+            #print(self.content[list(self.content.keys())[i]][9])
+            #print(self.content[list(self.content.keys())[i+3]][1])
+
+            r_ON = math.sqrt((self.content[list(self.content.keys())[i]][9] - self.content[list(self.content.keys())[i+3]][1])**2 +
+                            (self.content[list(self.content.keys())[i]][10] - self.content[list(self.content.keys())[i+3]][2])**2 +
+                            (self.content[list(self.content.keys())[i]][11] - self.content[list(self.content.keys())[i+3]][3])**2)
+            r_CH = math.sqrt((self.content[list(self.content.keys())[i]][5] - self.content[list(self.content.keys())[i+3]][13])**2 +
+                            (self.content[list(self.content.keys())[i]][6] - self.content[list(self.content.keys())[i+3]][14])**2 +
+                            (self.content[list(self.content.keys())[i]][7] - self.content[list(self.content.keys())[i+3]][15])**2)
+            r_OH = math.sqrt((self.content[list(self.content.keys())[i]][9] - self.content[list(self.content.keys())[i+3]][13])**2 +
+                            (self.content[list(self.content.keys())[i]][10] - self.content[list(self.content.keys())[i+3]][14])**2 +
+                            (self.content[list(self.content.keys())[i]][11] - self.content[list(self.content.keys())[i+3]][15])**2)
+            r_CN = math.sqrt((self.content[list(self.content.keys())[i]][5] - self.content[list(self.content.keys())[i+3]][1])**2 +
+                            (self.content[list(self.content.keys())[i]][6] - self.content[list(self.content.keys())[i+3]][2])**2 +
+                            (self.content[list(self.content.keys())[i]][7] - self.content[list(self.content.keys())[i+3]][3])**2)
+
+
+        E = q1*q2*(1/r_ON + 1/r_CH - 1/r_OH - 1/r_CN)*f
+        #E = 3
         #print(r_ON)
         #print(r_CH)
         #print(r_OH)
@@ -77,17 +83,19 @@ class Pdb:
 
 
 
-#    def find_helices(self):
+    #def find_bridges(self):
 
+
+#    def find_helices(self):
 
 
 
 if __name__ == '__main__':
     pdb = Pdb(sys.argv[1])
     #pdb=Pdb()
-    pdb.read_top()
+    #pdb.read_top()
     pdb.get_info()
-    print(pdb.find_Hbonds())
+    print(pdb.find_nturns())
 
     #print(pdb.content["16"][1])
     #print(int(list(pdb.content.keys())[0]))
