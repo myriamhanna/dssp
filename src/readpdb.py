@@ -14,13 +14,13 @@ class Pdb:
         self.list_ladders = []
         self.atom_names = ['N', 'C', 'H01', 'O']
         self.list_helices = []
+        self.list_sheets = []
 
 
     def read_pdb(self, filename):
         """method """
         with open(filename) as filin:
             return filin.readlines()
-
 
 
     def get_info(self):
@@ -81,9 +81,9 @@ class Pdb:
                 except IndexError:
                     pass
 
-        print(3, self.count(self.dict_nturns, 3))
-        print(4, self.count(self.dict_nturns, 4))
-        print(5, self.count(self.dict_nturns, 5))
+        #print(3, self.count(self.dict_nturns, 3))
+        #print(4, self.count(self.dict_nturns, 4))
+        #print(5, self.count(self.dict_nturns, 5))
         #print(self.dict_nturns)
 
 
@@ -136,6 +136,23 @@ class Pdb:
             prev_val = val
             count += 1
         print(self.list_ladders)
+        print("\n")
+        self.find_sheets()
+
+    def merge_tuples(self,obj):
+        merged_list = []
+        for i in range(0, len(obj)):
+            merged_list.append(str(int(obj[i][0])))
+            merged_list.append(str(int(obj[i][1])))
+        return merged_list
+
+    def find_sheets(self):
+        for idx, res1 in enumerate(self.list_ladders):
+            for res2 in self.list_ladders[idx+1:]:
+                result = self.merge_tuples(res1 + res2)
+                if len(list(set([x for x in result if result.count(x) > 1])))!= 0:
+                    self.list_sheets.append(res1 + res2)
+        print(self.list_sheets)
 
     def find_helices(self):
         prev_key = list(self.dict_nturns.keys())[0]
@@ -151,13 +168,6 @@ class Pdb:
             prev_key = key
             prev_val = val
         print(self.list_helices)
-
-
-
-
-
-
-
 
 
 
